@@ -33,7 +33,35 @@ void main() {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Enter Username",
+                        "Enter Fullname",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hint: Text("Fullname"),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      prefixIcon: Icon(Icons.person),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Enter Email or Phone Number",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -84,6 +112,35 @@ void main() {
                   ),
                 ),
                 SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Confirm PIN or Password",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hint: Text("Confirm PIN or password"),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      prefixIcon: Icon(Icons.lock),
+                      suffixIcon: Icon(Icons.visibility_off),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
                 // MaterialButton(
                 //   onPressed: () {},
                 //   child: Text("Login", style: TextStyle(color: Colors.white)),
@@ -103,22 +160,16 @@ void main() {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Text(
-                          "Login",
+                          "Sign Up",
                           style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
                       ),
                       SizedBox(height: 16),
                       Row(
                         children: [
-                          Text("Don't have an account? "),
-                          Text(
-                            "Sign Up",
-                            style: TextStyle(color: primaryColor),
-                          ),
+                          Text("Already have an account? "),
+                          Text("Log in", style: TextStyle(color: primaryColor)),
                           SizedBox(width: 5),
-                          Text("Forgot Password?"),
-                          SizedBox(width: 5),
-                          Text("Reset", style: TextStyle(color: primaryColor)),
                         ],
                       ),
                     ],
