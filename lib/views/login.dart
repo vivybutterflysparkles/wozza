@@ -34,7 +34,21 @@ class _LoginScreenState extends State<LoginScreen> {
               //     fontWeight: FontWeight.w800,
               //   ),
               // ),
-              Image.asset('assets/image.png', width: 200),
+              Image.asset('assets/wine.png', width: 140),
+
+              SizedBox(height: 10),
+
+              /// App Name
+              Text("Welcome back", style: TextStyle(fontSize: 20)),
+
+              const SizedBox(height: 5),
+
+              /// Tagline
+              const Text(
+                "Sign in to manage your bar",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
                 child: Row(

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:wozza/configs/colors.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -32,7 +35,20 @@ class _SignupScreenState extends State<SignupScreen> {
               //     fontWeight: FontWeight.w800,
               //   ),
               // ),
-              Image.asset('assets/image.png', width: 200),
+              Image.asset('assets/wine.png', width: 140),
+
+              SizedBox(height: 10),
+
+              Text("Create Account", style: TextStyle(fontSize: 20)),
+
+              SizedBox(height: 5),
+
+              /// Tagline
+              const Text(
+                "Join the bar management team",
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
                 child: Row(
@@ -175,7 +191,16 @@ class _SignupScreenState extends State<SignupScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Already have an account? "),
-                        Text("Log in", style: TextStyle(color: primaryColor)),
+                        GestureDetector(
+                          onTap: () {
+                            Get.toNamed("/login");
+                          },
+                          child: Text(
+                            "Log in",
+                            style: TextStyle(color: primaryColor),
+                          ),
+                        ),
+
                         SizedBox(width: 5),
                       ],
                     ),
