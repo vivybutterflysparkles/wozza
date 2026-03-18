@@ -9,8 +9,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   // Sample user data (matching the image)
-  final String fullName = 'vividopess';
-  final String email = 'vividopess@gmail.com';
+  final String fullName = 'Vivian Opindi';
+  final String email = 'opindivivian@gmail.com';
   final String role = 'Manager';
   final String memberSince = 'Jan 2024';
 
