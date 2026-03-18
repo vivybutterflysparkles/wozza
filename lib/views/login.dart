@@ -25,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Text(
               //   "Jumia Marketplace",
@@ -137,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 16),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text("Don't have an account? "),
                           GestureDetector(
@@ -148,7 +150,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               Get.toNamed("/signup");
                             },
                           ),
-                          SizedBox(width: 5),
+                        ],
+                      ),
+                      SizedBox(width: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                           Text("Forgot Password?"),
                           SizedBox(width: 5),
                           Text("Reset", style: TextStyle(color: primaryColor)),
