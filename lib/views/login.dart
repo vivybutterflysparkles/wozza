@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:wozza/configs/colors.dart';
+import 'package:wozza/controllers/logincontroller.dart';
+
+Logincontroller logincontroller = Get.put(Logincontroller());
+TextEditingController usernameController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -68,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: TextField(
+                  controller: usernameController,
                   decoration: InputDecoration(
                     hint: Text("Email or Phone Number"),
                     border: OutlineInputBorder(
@@ -95,14 +103,27 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hint: Text("PIN or Password"),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                child: Obx(
+                  () => TextField(
+                    obscureText: !logincontroller.isPasswordVisible.value,
+                    controller: passwordController,
+                    decoration: InputDecoration(
+                      hint: Text("PIN or Password"),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      prefixIcon: Icon(Icons.lock),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          logincontroller.togglePassword();
+                        },
+                        child: Icon(
+                          logincontroller.isPasswordVisible.value
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.lock),
-                    suffixIcon: Icon(Icons.visibility_off),
                   ),
                 ),
               ),
@@ -132,7 +153,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(color: Colors.white, fontSize: 15),
                           ),
                           onTap: () {
-                            Get.toNamed("/homescreen");
+                            bool success = logincontroller.login(
+                              usernameController.text,
+                              passwordController.text,
+                            );
+                            if (success) {
+                              Get.offAndToNamed("/homescreen");
+                            } else {
+                              Get.snackbar(
+                                "login failed",
+                                "invalid username or password",
+                              );
+                            }
                           },
                         ),
                       ),
