@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:wozza/configs/colors.dart';
+import 'package:wozza/controllers/signupcontroller.dart';
+
+Signupcontroller signupcontroller = Get.put(Signupcontroller());
+TextEditingController usernameController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
+TextEditingController confirmPasswordController = TextEditingController();
+TextEditingController emailController = TextEditingController();
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -24,7 +32,7 @@ class _SignupScreenState extends State<SignupScreen> {
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Column(
-             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Text(
@@ -67,6 +75,7 @@ class _SignupScreenState extends State<SignupScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: TextField(
+                  controller: usernameController,
                   decoration: InputDecoration(
                     hint: Text("Fullname"),
                     border: OutlineInputBorder(
