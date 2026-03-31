@@ -4,13 +4,11 @@ class Inventorycontroller extends GetxController {
   var itemname = '';
   var category = '';
   var quantity = '';
-  var search = '';
-  inventory(item, category, quantity, search) {
+  inventory(item, category, quantity) {
     itemname = item;
     category = category;
     quantity = quantity;
-    search = search;
-    if (itemname == "" && category == "" && quantity == "" && search == "") {
+    if (itemname == "" && category == "" && quantity == "") {
       return true;
     } else {
       return false;

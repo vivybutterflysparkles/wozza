@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:wozza/configs/colors.dart';
 import 'package:wozza/controllers/signupcontroller.dart';
-
-Signupcontroller signupcontroller = Get.put(Signupcontroller());
-TextEditingController usernameController = TextEditingController();
-TextEditingController passwordController = TextEditingController();
-TextEditingController confirmPasswordController = TextEditingController();
-TextEditingController emailController = TextEditingController();
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -19,15 +11,18 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  // Controllers
+  final Signupcontroller signupcontroller = Get.put(Signupcontroller());
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.deepOrangeAccent,
-      //   title: Text("Logging Page", style: TextStyle(color: Colors.white)),
-      //   centerTitle: true,
-      // ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
@@ -35,32 +30,20 @@ class _SignupScreenState extends State<SignupScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Text(
-              //   "Jumia Marketplace",
-              //   style: TextStyle(
-              //     color: Colors.blue,
-              //     fontSize: 30,
-              //     fontWeight: FontWeight.w800,
-              //   ),
-              // ),
               Image.asset('assets/wine.png', width: 140),
-
               SizedBox(height: 10),
-
               Text("Create Account", style: TextStyle(fontSize: 20)),
-
               SizedBox(height: 5),
-
-              /// Tagline
               const Text(
                 "Join the bar management team",
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
+
+              // Username
               Padding(
                 padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       "Enter Fullname",
@@ -77,7 +60,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: TextField(
                   controller: usernameController,
                   decoration: InputDecoration(
-                    hint: Text("Fullname"),
+                    hintText: "Fullname",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -86,10 +69,11 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               SizedBox(height: 20),
+
+              // Email
               Padding(
                 padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       "Enter Email or Phone Number",
@@ -104,20 +88,22 @@ class _SignupScreenState extends State<SignupScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: TextField(
+                  controller: emailController,
                   decoration: InputDecoration(
-                    hint: Text("Email or Phone Number"),
+                    hintText: "Email or Phone Number",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(Icons.email),
                   ),
                 ),
               ),
               SizedBox(height: 20),
+
+              // Password
               Padding(
                 padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       "Enter Password",
@@ -131,25 +117,37 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hint: Text("PIN or Password"),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                child: Obx(
+                  () => TextField(
+                    controller: passwordController,
+                    obscureText: !signupcontroller.isPasswordVisible.value,
+                    decoration: InputDecoration(
+                      hintText: "PIN or Password",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      prefixIcon: Icon(Icons.lock),
+                      suffixIcon: GestureDetector(
+                        onTap: () => signupcontroller.togglePassword(),
+                        child: Icon(
+                          signupcontroller.isPasswordVisible.value
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.lock),
-                    suffixIcon: Icon(Icons.visibility_off),
                   ),
                 ),
               ),
               SizedBox(height: 20),
+
+              // Confirm Password
               Padding(
                 padding: const EdgeInsets.fromLTRB(25, 0, 20, 5),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      "Confirm PIN or Password",
+                      "Confirm Password",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -160,61 +158,82 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hint: Text("Confirm PIN or password"),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                child: Obx(
+                  () => TextField(
+                    controller: confirmPasswordController,
+                    obscureText: !signupcontroller.isPasswordVisible.value,
+                    decoration: InputDecoration(
+                      hintText: "Confirm PIN or password",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      prefixIcon: Icon(Icons.lock),
+                      suffixIcon: GestureDetector(
+                        onTap: () => signupcontroller.togglePassword(),
+                        child: Icon(
+                          signupcontroller.isPasswordVisible.value
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.lock),
-                    suffixIcon: Icon(Icons.visibility_off),
                   ),
                 ),
               ),
               SizedBox(height: 20),
-              // MaterialButton(
-              //   onPressed: () {},
-              //   child: Text("Login", style: TextStyle(color: Colors.white)),
-              //   color: Colors.deepOrangeAccent,
 
-              // ),
+              // Sign Up Button
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 50,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(color: Colors.white, fontSize: 15),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Already have an account? "),
-                        GestureDetector(
-                          onTap: () {
-                            Get.toNamed("/login");
-                          },
-                          child: Text(
-                            "Log in",
-                            style: TextStyle(color: primaryColor),
-                          ),
-                        ),
+                child: GestureDetector(
+                  onTap: () {
+                    bool success = signupcontroller.signup(
+                      usernameController.text,
+                      passwordController.text,
+                      confirmPasswordController.text,
+                      emailController.text,
+                    );
 
-                        SizedBox(width: 5),
-                      ],
+                    if (success) {
+                      Get.offAndToNamed("/homescreen");
+                    } else {
+                      Get.snackbar(
+                        "Sign Up Failed",
+                        "Invalid details or passwords do not match",
+                      );
+                    }
+                  },
+                  child: Container(
+                    height: 50,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                  ],
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                  ),
                 ),
+              ),
+
+              SizedBox(height: 16),
+
+              // Already have account
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Already have an account? "),
+                  GestureDetector(
+                    onTap: () => Get.toNamed("/login"),
+                    child: Text(
+                      "Log in",
+                      style: TextStyle(color: primaryColor),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
