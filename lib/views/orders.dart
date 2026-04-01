@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:http/http.dart' as http;
+import 'package:wozza/configs/colors.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -8,6 +14,18 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
+  fetchOrders() async{
+    var response = await http.get(Uri.parse("http://localhost/orders/orders.php"));
+    if(response.statusCode == 200){
+
+      var serverData = jsonDecode(response.body);
+      var OrderData = serverData["data"];
+      for(var order in orderData);
+      print(response.body);
+    }else{
+      Get.snackbar("Error","Server error");
+    }
+  }
   /// 🔥 POPUP
   void _showNewOrderDialog() {
     TextEditingController tableController = TextEditingController();
@@ -107,7 +125,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: primaryColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -140,7 +158,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                     ),
-                    onPressed: () {},
+                    onPressed: (){},
                     child: const Text("Start Preparing"),
                   ),
                   const SizedBox(width: 8),
@@ -156,7 +174,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ListView.builder(
+      itemCount: 10,
+      itemBuilder: (context, index){
+        return Row(children: [
+          Image.asset("assets/logo.jpeg",width: 100,height: 100),
+          Column(children: [Text(tableNames[index]), Text(itemNames[index])
+          ],)
+        ],)
+      },
       backgroundColor: Colors.grey[100],
 
       appBar: AppBar(
@@ -197,7 +223,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: primaryColor,
                     ),
                     onPressed: _showNewOrderDialog,
                     child: const Text("+ New Order"),
