@@ -34,7 +34,7 @@ class Signupcontroller extends GetxController {
     try {
       // 2. Your API URL
       // Replace with your IPv4 address from ipconfig
-      var url = Uri.parse("http://192.168.x.x/wozza/signup.php");
+      var url = Uri.parse("http://10.7.1.165/wozza/signup.php");
 
       // 3. Send POST request to PHP
       var response = await http.post(

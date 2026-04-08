@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Simplified import
+import 'package:get/get.dart';
 import 'package:wozza/configs/colors.dart';
 import 'package:wozza/controllers/logincontroller.dart';
 
@@ -11,14 +11,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Move controllers inside the state
   final Logincontroller logincontroller = Get.put(Logincontroller());
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   void dispose() {
-    // Good practice: dispose of text controllers
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -34,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 50), // Added some top space
+              const SizedBox(height: 50),
               Image.asset('assets/wine.png', width: 140),
               const SizedBox(height: 10),
               const Text("Welcome back", style: TextStyle(fontSize: 20)),
@@ -46,13 +44,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Username Field
+              /// Username Field
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: TextField(
                   controller: usernameController,
                   decoration: InputDecoration(
-                    labelText: "Username", // Better than a separate Text widget
+                    labelText: "Username",
                     hintText: "Email or Phone Number",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -63,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Password Field
+              /// Password Field
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Obx(
@@ -78,7 +76,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
-                        // Used IconButton for better touch response
                         icon: Icon(
                           logincontroller.isPasswordVisible.value
                               ? Icons.visibility
@@ -90,14 +87,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 15),
+
+              /// Forgot Password
               const SizedBox(height: 30),
 
-              // Login Button
+              /// Login Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: GestureDetector(
                   onTap: () async {
-                    // Show a loading dialog or state here if needed
                     bool success = await logincontroller.login(
                       usernameController.text,
                       passwordController.text,
@@ -135,7 +135,45 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              // ... Rest of your Sign Up / Forgot password rows
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Forgot Password? "),
+                  GestureDetector(
+                    child: Text(
+                      "Reset",
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              /// Sign Up
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Don't have an account? "),
+                  GestureDetector(
+                    onTap: () {
+                      Get.toNamed("/signup");
+                    },
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
             ],
           ),
         ),

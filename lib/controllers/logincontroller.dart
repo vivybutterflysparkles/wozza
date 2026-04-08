@@ -25,7 +25,7 @@ class Logincontroller extends GetxController {
     try {
       // 2. Your API URL
       // Replace 192.168.x.x with your IPv4 address from ipconfig
-      var url = Uri.parse("http://192.168.x.x/wozza/login.php");
+      var url = Uri.parse("http://localhost/wozza/login.php");
 
       // 3. Send POST request
       var response = await http.post(
