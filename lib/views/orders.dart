@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:wozza/configs/colors.dart';
+import 'package:wozza/configs/api.dart';
 
 //  Model
 
@@ -48,9 +49,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   List<OrderModel> orders = [];
   bool isLoading = false;
 
-  // FIX 1: Use 10.0.2.2 for Android emulator, or your LAN IP for a real device.
-  // Change this to your actual server address.
-  static const String baseUrl = 'http://10.0.2.2/orders/orders.php';
+  static String get baseUrl => '${ApiConfig.baseUrl}/orders.php';
 
   // FIX 2: fetchOrders() is now called from initState.
   @override

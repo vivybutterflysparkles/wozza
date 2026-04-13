@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:wozza/controllers/inventorycontroller.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -8,27 +10,24 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-  final List<InventoryItem> _items = [
-    InventoryItem(name: 'Beer - Lager', category: 'Beer', quantity: 48),
-    InventoryItem(name: 'Beer - IPA', category: 'Beer', quantity: 36),
-    InventoryItem(name: 'Beer - Stout', category: 'Beer', quantity: 24),
-    InventoryItem(name: 'Red Wine', category: 'Wine', quantity: 20),
-    InventoryItem(name: 'White Wine', category: 'Wine', quantity: 18),
-    InventoryItem(name: 'Champagne', category: 'Wine', quantity: 10),
-  ];
+  final Inventorycontroller controller = Get.put(Inventorycontroller());
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchInventory();
+  }
 
   void _incrementQuantity(int index) {
-    setState(() {
-      _items[index].quantity++;
-    });
+    int newQty = controller.inventoryList[index].quantity + 1;
+    controller.updateQuantity(controller.inventoryList[index].id, newQty);
   }
 
   void _decrementQuantity(int index) {
-    setState(() {
-      if (_items[index].quantity > 0) {
-        _items[index].quantity--;
-      }
-    });
+    if (controller.inventoryList[index].quantity > 0) {
+      int newQty = controller.inventoryList[index].quantity - 1;
+      controller.updateQuantity(controller.inventoryList[index].id, newQty);
+    }
   }
 
   /// 🔥 ADD ITEM POPUP
@@ -73,15 +72,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 if (nameController.text.isNotEmpty &&
                     categoryController.text.isNotEmpty &&
                     quantityController.text.isNotEmpty) {
-                  setState(() {
-                    _items.add(
-                      InventoryItem(
-                        name: nameController.text,
-                        category: categoryController.text,
-                        quantity: int.tryParse(quantityController.text) ?? 0,
-                      ),
-                    );
-                  });
+                  controller.addInventory(
+                    nameController.text,
+                    categoryController.text,
+                    int.tryParse(quantityController.text) ?? 0,
+                  );
 
                   Navigator.pop(context);
                 }
@@ -161,71 +156,66 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
             /// 📦 LIST
             Expanded(
-              child: ListView.builder(
-                itemCount: _items.length,
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return ListView.builder(
+                  itemCount: controller.inventoryList.length,
+                  itemBuilder: (context, index) {
+                    final item = controller.inventoryList[index];
 
-                itemBuilder: (context, index) {
-                  final item = _items[index];
-
-                  return Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.only(bottom: 12),
-
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-
-                      child: Row(
-                        children: [
-                          /// ITEM INFO
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                    return Card(
+                      elevation: 3,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            /// ITEM INFO
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    item.category,
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            /// QUANTITY CONTROLS
+                            Row(
+                              children: [
+                                Text('${item.quantity} units'),
+                                IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  onPressed: () => _decrementQuantity(index),
                                 ),
-
-                                const SizedBox(height: 4),
-
-                                Text(
-                                  item.category,
-                                  style: const TextStyle(color: Colors.grey),
+                                IconButton(
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  onPressed: () => _incrementQuantity(index),
                                 ),
                               ],
                             ),
-                          ),
-
-                          /// QUANTITY CONTROLS
-                          Row(
-                            children: [
-                              Text('${item.quantity} bottles'),
-
-                              IconButton(
-                                icon: const Icon(Icons.remove_circle_outline),
-                                onPressed: () => _decrementQuantity(index),
-                              ),
-
-                              IconButton(
-                                icon: const Icon(Icons.add_circle_outline),
-                                onPressed: () => _incrementQuantity(index),
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                );
+              }),
             ),
           ],
         ),
@@ -234,15 +224,3 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 }
 
-/// MODEL
-class InventoryItem {
-  final String name;
-  final String category;
-  int quantity;
-
-  InventoryItem({
-    required this.name,
-    required this.category,
-    required this.quantity,
-  });
-}

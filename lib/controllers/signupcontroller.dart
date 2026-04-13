@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:wozza/configs/api.dart';
 
 class Signupcontroller extends GetxController {
   // Observables
@@ -33,8 +34,7 @@ class Signupcontroller extends GetxController {
 
     try {
       // 2. Your API URL
-      // Replace with your IPv4 address from ipconfig
-      var url = Uri.parse("http://10.7.1.165/wozza/signup.php");
+      var url = Uri.parse("${ApiConfig.baseUrl}/signup.php");
 
       // 3. Send POST request to PHP
       var response = await http.post(

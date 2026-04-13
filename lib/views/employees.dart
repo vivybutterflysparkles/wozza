@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:wozza/controllers/employeescontroller.dart';
 
 class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
@@ -8,26 +10,13 @@ class EmployeesScreen extends StatefulWidget {
 }
 
 class _EmployeesScreenState extends State<EmployeesScreen> {
-  final List<Map<String, String>> employees = [
-    {
-      "name": "John Smith",
-      "email": "john@barmetrics.com",
-      "role": "Bartender",
-      "date": "2024-01-15",
-    },
-    {
-      "name": "Sarah Johnson",
-      "email": "sarah@barmetrics.com",
-      "role": "Server",
-      "date": "2024-03-20",
-    },
-    {
-      "name": "Mike Davis",
-      "email": "mike@barmetrics.com",
-      "role": "Manager",
-      "date": "2023-11-10",
-    },
-  ];
+  final Employeescontroller controller = Get.put(Employeescontroller());
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchEmployees();
+  }
 
   void showAddEmployeeDialog() {
     final nameController = TextEditingController();
@@ -64,16 +53,11 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  employees.add({
-                    "name": nameController.text,
-                    "email": emailController.text,
-                    "role": roleController.text,
-                    "date": DateTime.now().toString().split(
-                      " ",
-                    )[0], // yyyy-mm-dd
-                  });
-                });
+                controller.addEmployee(
+                  nameController.text,
+                  emailController.text,
+                  roleController.text,
+                );
                 Navigator.pop(context);
               },
               child: const Text("Add"),
@@ -84,7 +68,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
     );
   }
 
-  Widget employeeCard(Map<String, String> emp, int index) {
+  Widget employeeCard(Map<String, dynamic> emp, int index) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -126,9 +110,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
         trailing: IconButton(
           icon: const Icon(Icons.delete, color: Colors.red),
           onPressed: () {
-            setState(() {
-              employees.removeAt(index);
-            });
+            controller.deleteEmployee(emp["id"]?.toString() ?? "");
           },
         ),
       ),
@@ -176,13 +158,13 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                     "Total Employees",
                     style: TextStyle(color: Colors.grey),
                   ),
-                  Text(
-                    employees.length.toString(),
+                  Obx(() => Text(
+                    controller.employeesList.length.toString(),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
+                  )),
                 ],
               ),
             ),
@@ -191,12 +173,17 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
 
             // Employee List
             Expanded(
-              child: ListView.builder(
-                itemCount: employees.length,
-                itemBuilder: (context, index) {
-                  return employeeCard(employees[index], index);
-                },
-              ),
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return ListView.builder(
+                  itemCount: controller.employeesList.length,
+                  itemBuilder: (context, index) {
+                    return employeeCard(controller.employeesList[index], index);
+                  },
+                );
+              }),
             ),
           ],
         ),

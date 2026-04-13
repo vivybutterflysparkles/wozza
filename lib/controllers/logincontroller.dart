@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:wozza/configs/api.dart';
 
 class Logincontroller extends GetxController {
   // Observables for the UI
@@ -24,8 +25,7 @@ class Logincontroller extends GetxController {
 
     try {
       // 2. Your API URL
-      // Replace 192.168.x.x with your IPv4 address from ipconfig
-      var url = Uri.parse("http://localhost/wozza/login.php");
+      var url = Uri.parse("${ApiConfig.baseUrl}/login.php");
 
       // 3. Send POST request
       var response = await http.post(
