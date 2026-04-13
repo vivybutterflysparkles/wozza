@@ -1,12 +1,14 @@
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:wozza/configs/api.dart'; // Ensure you have this for your IP address
 
 class Employeescontroller extends GetxController {
   var employeesList = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
 
-  static const String baseUrl = 'http://localhost/wozza/employees.php';
+  // IMPORTANT: Replace localhost with your computer's IPv4 address for real devices
+  static final String baseUrl = "${ApiConfig.baseUrl}/employees.php";
 
   Future<void> fetchEmployees() async {
     isLoading.value = true;
@@ -18,8 +20,6 @@ class Employeescontroller extends GetxController {
         employeesList.value = data
             .map((e) => e as Map<String, dynamic>)
             .toList();
-      } else {
-        Get.snackbar('Error', 'Server error (${response.statusCode})');
       }
     } catch (e) {
       Get.snackbar('Error', 'Could not fetch employees: $e');
@@ -36,13 +36,12 @@ class Employeescontroller extends GetxController {
     try {
       final response = await http.post(
         Uri.parse(baseUrl),
-        body: {"name": name, "email": email, "role": role},
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"name": name, "email": email, "role": role}),
       );
       if (response.statusCode == 200) {
         await fetchEmployees();
         Get.snackbar('Success', 'Employee added');
-      } else {
-        Get.snackbar('Error', 'Failed to add employee');
       }
     } catch (e) {
       Get.snackbar('Error', 'Network error: $e');
@@ -50,10 +49,12 @@ class Employeescontroller extends GetxController {
   }
 
   Future<void> deleteEmployee(String id) async {
+    if (id.isEmpty) return;
     try {
       final response = await http.post(
         Uri.parse(baseUrl),
-        body: {"action": "delete", "id": id},
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"action": "delete", "id": id}),
       );
       if (response.statusCode == 200) {
         await fetchEmployees();

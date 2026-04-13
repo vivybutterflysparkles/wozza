@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:wozza/controllers/inventorycontroller.dart';
+import 'package:wozza/controllers/inventorycontroller.dart'; // Ensure correct path
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -10,27 +10,16 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
+  // 1. Initialize the Controller
   final Inventorycontroller controller = Get.put(Inventorycontroller());
 
   @override
   void initState() {
     super.initState();
+    // 2. Fetch data when screen loads
     controller.fetchInventory();
   }
 
-  void _incrementQuantity(int index) {
-    int newQty = controller.inventoryList[index].quantity + 1;
-    controller.updateQuantity(controller.inventoryList[index].id, newQty);
-  }
-
-  void _decrementQuantity(int index) {
-    if (controller.inventoryList[index].quantity > 0) {
-      int newQty = controller.inventoryList[index].quantity - 1;
-      controller.updateQuantity(controller.inventoryList[index].id, newQty);
-    }
-  }
-
-  /// 🔥 ADD ITEM POPUP
   void _showAddItemDialog() {
     final nameController = TextEditingController();
     final categoryController = TextEditingController();
@@ -41,7 +30,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text("Add New Item"),
-
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -60,26 +48,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ),
             ],
           ),
-
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancel"),
             ),
-
             ElevatedButton(
               onPressed: () {
-                if (nameController.text.isNotEmpty &&
-                    categoryController.text.isNotEmpty &&
-                    quantityController.text.isNotEmpty) {
-                  controller.addInventory(
-                    nameController.text,
-                    categoryController.text,
-                    int.tryParse(quantityController.text) ?? 0,
-                  );
-
-                  Navigator.pop(context);
-                }
+                controller.addInventory(
+                  nameController.text,
+                  categoryController.text,
+                  int.tryParse(quantityController.text) ?? 0,
+                );
+                Navigator.pop(context);
               },
               child: const Text("Add"),
             ),
@@ -92,122 +73,68 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /// APP BAR
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text("Inventory"),
       ),
-
-      /// BODY
       body: Padding(
         padding: const EdgeInsets.all(16),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
-            /// 🔥 BIG TITLE (VISIBLE)
             const Text(
               "Inventory Management",
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
-
-            const SizedBox(height: 6),
-
-            const Text(
-              "Track and manage your stock",
-              style: TextStyle(color: Colors.grey),
-            ),
-
             const SizedBox(height: 16),
 
-            /// 🔍 SEARCH BAR
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search inventory...',
-                prefixIcon: const Icon(Icons.search),
-
-                filled: true,
-                fillColor: Colors.grey.shade100,
-
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            /// ➕ ADD BUTTON
+            // Add Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _showAddItemDialog,
                 icon: const Icon(Icons.add),
                 label: const Text("Add New Item"),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
               ),
             ),
-
             const SizedBox(height: 16),
 
-            /// 📦 LIST
+            // 3. Use Obx to listen to controller changes
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
                 return ListView.builder(
                   itemCount: controller.inventoryList.length,
                   itemBuilder: (context, index) {
                     final item = controller.inventoryList[index];
 
                     return Card(
-                      elevation: 3,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
+                      child: ListTile(
+                        title: Text(
+                          item.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(item.category),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            /// ITEM INFO
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.name,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item.category,
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                                ],
+                            Text('${item.quantity} units'),
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline),
+                              onPressed: () => controller.updateQuantity(
+                                item.id,
+                                item.quantity - 1,
                               ),
                             ),
-                            /// QUANTITY CONTROLS
-                            Row(
-                              children: [
-                                Text('${item.quantity} units'),
-                                IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  onPressed: () => _decrementQuantity(index),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.add_circle_outline),
-                                  onPressed: () => _incrementQuantity(index),
-                                ),
-                              ],
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: () => controller.updateQuantity(
+                                item.id,
+                                item.quantity + 1,
+                              ),
                             ),
                           ],
                         ),
@@ -223,4 +150,3 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 }
-
