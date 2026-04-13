@@ -108,8 +108,8 @@ class _SignupScreenState extends State<SignupScreen> {
                             );
 
                             if (success) {
-                              // If PHP returns success: true, go to home
-                              Get.offAllNamed("/homescreen");
+                              // If PHP returns success: true, go to login
+                              Get.offAllNamed("/login");
                             }
                           },
                     child: Container(

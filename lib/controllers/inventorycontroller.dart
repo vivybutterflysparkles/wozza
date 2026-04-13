@@ -29,7 +29,7 @@ class Inventorycontroller extends GetxController {
   var inventoryList = <InventoryItem>[].obs;
   var isLoading = false.obs;
 
-  static const String baseUrl = 'http://10.0.2.2/wozza/inventory.php';
+  static const String baseUrl = 'http://localhost/wozza/inventory.php';
 
   Future<void> fetchInventory() async {
     isLoading.value = true;

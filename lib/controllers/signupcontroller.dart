@@ -8,6 +8,8 @@ class Signupcontroller extends GetxController {
   var isPasswordVisible = false.obs;
   var isLoading = false.obs; // To track if the request is in progress
 
+  static const String baseUrl = 'http://localhost/wozza/signup.php';
+
   void togglePassword() {
     isPasswordVisible.value = !isPasswordVisible.value;
   }

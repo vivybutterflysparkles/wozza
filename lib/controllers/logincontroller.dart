@@ -4,42 +4,35 @@ import 'dart:convert';
 import 'package:wozza/configs/api.dart';
 
 class Logincontroller extends GetxController {
-  // Observables for the UI
   var isPasswordVisible = false.obs;
-  var isLoading = false.obs; // To show a spinner while logging in
+  var isLoading = false.obs;
 
-  // Toggle password visibility
   void togglePassword() {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  // Updated Login Function to talk to XAMPP
   Future<bool> login(String user, String pass) async {
-    // 1. Basic Validation
     if (user.isEmpty || pass.isEmpty) {
-      Get.snackbar("Error", "Please enter both username and password");
+      Get.snackbar("Error", "Please enter both email and password");
       return false;
     }
 
     isLoading.value = true;
 
     try {
-      // 2. Your API URL
       var url = Uri.parse("${ApiConfig.baseUrl}/login.php");
 
-      // 3. Send POST request
+      // We use jsonEncode to ensure PHP's file_get_contents can read it
       var response = await http.post(
         url,
-        body: {"username": user, "password": pass},
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"fullname": user, "password": pass}),
       );
 
-      // 4. Handle Response
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
         if (data['success'] == true) {
-          // You can even save user data here if you want
-          // e.g., String fullName = data['user']['fullname'];
           return true;
         } else {
           Get.snackbar("Login Failed", data['message']);
@@ -52,7 +45,7 @@ class Logincontroller extends GetxController {
     } catch (e) {
       Get.snackbar(
         "Connection Error",
-        "Check if XAMPP is running and IP is correct",
+        "Ensure XAMPP is running and IP is correct",
       );
       print("Error: $e");
       return false;
