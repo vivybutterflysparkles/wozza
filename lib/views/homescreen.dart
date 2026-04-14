@@ -5,6 +5,7 @@ import 'package:wozza/views/employees.dart';
 import 'package:wozza/views/inventory.dart';
 import 'package:wozza/views/orders.dart';
 import 'package:wozza/views/profile.dart';
+import 'package:wozza/views/menu.dart';
 import 'package:wozza/views/time.dart';
 
 class Homescreen extends StatefulWidget {
@@ -101,6 +102,14 @@ class _HomescreenState extends State<Homescreen> {
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 20),
+
+            dashboardCard(
+              title: "Menu",
+              subtitle: "View all menu items and prices",
+              imagePath: "assets/menu.jpg",
+              icon: Icons.menu,
+              page: MenuScreen(),
+            ),
 
             dashboardCard(
               title: "Inventory",
