@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wozza/configs/colors.dart';
 import 'package:wozza/controllers/inventorycontroller.dart';
 
 class InventoryScreen extends StatefulWidget {
@@ -18,52 +19,151 @@ class _InventoryScreenState extends State<InventoryScreen> {
     controller.fetchInventory();
   }
 
+  /// THE UPDATED POPUP DIALOG
+  /// Matches the provided reference image exactly
   void _showAddItemDialog() {
     final nameController = TextEditingController();
     final categoryController = TextEditingController();
-    final quantityController = TextEditingController();
+    final quantityController = TextEditingController(text: "0");
+    final unitController = TextEditingController();
+    final minStockController = TextEditingController(text: "0");
 
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Add New Item"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: "Item Name"),
+      barrierDismissible: true,
+      barrierLabel: "",
+      pageBuilder: (context, a1, a2) => const SizedBox(),
+      transitionBuilder: (context, a1, a2, child) {
+        return Transform.scale(
+          scale: a1.value,
+          child: Opacity(
+            opacity: a1.value,
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-              TextField(
-                controller: categoryController,
-                decoration: const InputDecoration(labelText: "Category"),
+              backgroundColor: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Add New Inventory Item",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Get.back(),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.grey,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        "Enter the details of the new inventory item.",
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Item Name Field
+                      _customLabel("Item Name"),
+                      _customField(
+                        nameController,
+                        "e.g., Vodka",
+                        isBordered: true,
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Category Field
+                      _customLabel("Category"),
+                      _customField(categoryController, "e.g., Spirits"),
+                      const SizedBox(height: 15),
+
+                      // Quantity and Unit Row
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _customLabel("Quantity"),
+                                _customField(
+                                  quantityController,
+                                  "0",
+                                  isNum: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _customLabel("Unit"),
+                                _customField(unitController, "e.g., bottles"),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Minimum Stock Level
+                      _customLabel("Minimum Stock Level"),
+                      _customField(minStockController, "0", isNum: true),
+
+                      const SizedBox(height: 25),
+
+                      // Add Item Button
+                      SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            controller.addInventory(
+                              nameController.text,
+                              categoryController.text,
+                              int.tryParse(quantityController.text) ?? 0,
+                            );
+                            Get.back();
+                          },
+                          child: const Text(
+                            "Add Item",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              TextField(
-                controller: quantityController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: "Quantity"),
-              ),
-            ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              onPressed: () {
-                controller.addInventory(
-                  nameController.text,
-                  categoryController.text,
-                  int.tryParse(quantityController.text) ?? 0,
-                );
-                Navigator.pop(context);
-              },
-              child: const Text("Add", style: TextStyle(color: Colors.white)),
-            ),
-          ],
         );
       },
     );
@@ -122,13 +222,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 ),
                 const SizedBox(height: 15),
 
-                // Red Add Button
+                // Primary Color Add Button
                 SizedBox(
-                  width: 180, // Matches image style
+                  width: 200,
                   child: ElevatedButton.icon(
                     onPressed: _showAddItemDialog,
                     icon: const Icon(
-                      Icons.inventory,
+                      Icons.inventory_2_outlined,
                       color: Colors.white,
                       size: 18,
                     ),
@@ -137,7 +237,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade700,
+                      backgroundColor: primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -148,12 +248,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
             ),
           ),
 
-          // Inventory List
+          // Inventory List Section
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Colors.red),
+                return Center(
+                  child: CircularProgressIndicator(color: primaryColor),
                 );
               }
 
@@ -175,7 +275,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           offset: const Offset(0, 3),
                         ),
                       ],
-                      // The Thick Black Left Border from the image
+                      // Thick Left Border
                       border: const Border(
                         left: BorderSide(color: Colors.black, width: 6),
                       ),
@@ -184,7 +284,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
-                          // Item Info
+                          // Item Details
                           Expanded(
                             flex: 3,
                             child: Column(
@@ -205,7 +305,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             ),
                           ),
 
-                          // Quantity Display
+                          // Quantity Label
                           Expanded(
                             flex: 2,
                             child: Column(
@@ -218,7 +318,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   ),
                                 ),
                                 const Text(
-                                  "bottles",
+                                  "units",
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 12,
@@ -228,7 +328,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             ),
                           ),
 
-                          // Action Buttons
+                          // Plus/Minus Buttons
                           Row(
                             children: [
                               _qtyBtn(
@@ -262,17 +362,60 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  // Helper for those specific red/white buttons
+  /// Helper for custom form labels
+  Widget _customLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5, left: 2),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      ),
+    );
+  }
+
+  /// Helper for custom text fields that match the image
+  Widget _customField(
+    TextEditingController controller,
+    String hint, {
+    bool isBordered = false,
+    bool isNum = false,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: isNum ? TextInputType.number : TextInputType.text,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+        filled: !isBordered,
+        fillColor: Colors.grey.shade50,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 15,
+        ),
+        border: isBordered
+            ? OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: primaryColor, width: 2),
+              )
+            : OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+      ),
+    );
+  }
+
+  /// Helper for the plus/minus buttons
   Widget _qtyBtn(IconData icon, VoidCallback onPress, {bool isMinus = false}) {
     return GestureDetector(
       onTap: onPress,
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: isMinus ? Colors.white : Colors.red,
+          color: isMinus ? Colors.white : primaryColor,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: isMinus ? Colors.grey.shade400 : Colors.red,
+            color: isMinus ? Colors.grey.shade400 : primaryColor,
           ),
         ),
         child: Icon(

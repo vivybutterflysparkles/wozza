@@ -158,13 +158,15 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                     "Total Employees",
                     style: TextStyle(color: Colors.grey),
                   ),
-                  Obx(() => Text(
-                    controller.employeesList.length.toString(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Obx(
+                    () => Text(
+                      controller.employeesList.length.toString(),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             ),
