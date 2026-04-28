@@ -79,7 +79,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                       const SizedBox(height: 15),
                       _fieldLabel("Designated Role"),
                       DropdownButtonFormField<String>(
-                        value: selectedRole,
+                        initialValue: selectedRole,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.grey.shade50,

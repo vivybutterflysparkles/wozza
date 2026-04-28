@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:wozza/configs/colors.dart';
 import 'package:wozza/configs/api.dart';
 import 'package:wozza/controllers/menucontroller.dart' as wozza_menu;
+import 'package:wozza/views/homescreen.dart';
 
 // --- MODEL ---
 class OrderModel {
@@ -133,7 +134,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
-  // --- THE NEW INTERACTIVE DIALOG ---
+  // --- NEW ORDER DIALOG ---
   void _showNewOrderDialog() {
     final tableController = TextEditingController();
     Map<String, int> selectedItems = {};
@@ -407,15 +408,20 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
+
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        leading: const Icon(Icons.arrow_back, color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Get.offAll(() => const Homescreen()),
+        ),
         title: const Text(
           "Back to Dashboard",
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
       ),
+
       body: Column(
         children: [
           // Header Section

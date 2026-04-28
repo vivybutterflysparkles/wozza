@@ -30,7 +30,7 @@ class MenuScreen extends StatelessWidget {
               keyboardType: TextInputType.number,
             ),
             DropdownButtonFormField(
-              value: selectedCategory,
+              initialValue: selectedCategory,
               items: [
                 'Beer',
                 'Cocktails',
@@ -80,8 +80,9 @@ class MenuScreen extends StatelessWidget {
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: Obx(() {
-        if (controller.isLoading.value)
+        if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
+        }
         return ListView.builder(
           padding: const EdgeInsets.all(15),
           itemCount: controller.menuList.length,

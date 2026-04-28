@@ -137,22 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 20),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Forgot Password? "),
-                  GestureDetector(
-                    child: Text(
-                      "Reset",
-                      style: TextStyle(
-                        color: primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
               /// Sign Up
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

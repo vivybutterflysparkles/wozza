@@ -1,151 +1,166 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:wozza/configs/colors.dart';
+import 'package:wozza/controllers/timecontroller.dart';
+import 'package:wozza/controllers/employeescontroller.dart'; // IMPORTED THIS
 
 class TimeScreen extends StatefulWidget {
   const TimeScreen({super.key});
-
   @override
   State<TimeScreen> createState() => _TimeScreenState();
 }
 
 class _TimeScreenState extends State<TimeScreen> {
-  /// 🔥 OPTIONAL POPUP (ADD SHIFT)
+  final TimeController controller = Get.put(TimeController());
+  // Access the employees already in memory
+  final Employeescontroller empController = Get.put(Employeescontroller());
+
   void _showAddShiftDialog() {
-    TextEditingController nameController = TextEditingController();
+    String? selectedEmployee;
+    DateTime selectedDate = DateTime.now();
+    TimeOfDay selectedTime = TimeOfDay.now();
+
+    // Ensure we have fresh employee data
+    empController.fetchEmployees();
 
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Add Shift"),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(labelText: "Employee Name"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Add"),
+            title: const Text(
+              "New Shift Details",
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          ],
-        );
-      },
-    );
-  }
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Select Employee",
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 5),
 
-  /// 🔥 ACTIVE SHIFT CARD
-  Widget activeShiftCard(String name, String time) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(16),
+                // DROPDOWN LINKED TO EMPLOYEES
+                Obx(() {
+                  if (empController.isLoading.value) {
+                    return const LinearProgressIndicator();
+                  }
+                  if (empController.employeesList.isEmpty) {
+                    return const Text(
+                      "No staff found in Employee Hub",
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    );
+                  }
+                  return DropdownButtonFormField<String>(
+                    isExpanded: true,
+                    hint: const Text("Choose Staff"),
+                    value: selectedEmployee,
+                    items: empController.employeesList.map((emp) {
+                      return DropdownMenuItem<String>(
+                        value: emp['name'].toString(),
+                        child: Text(emp['name'].toString()),
+                      );
+                    }).toList(),
+                    onChanged: (val) =>
+                        setDialogState(() => selectedEmployee = val),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey.shade50,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  );
+                }),
 
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
-        border: const Border(left: BorderSide(color: Colors.green, width: 5)),
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          /// LEFT SIDE
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-
-              const SizedBox(height: 5),
-
-              Row(
-                children: const [
-                  Icon(Icons.calendar_today, size: 14),
-                  SizedBox(width: 5),
-                  Text("2026-01-04"),
-                ],
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Shift Date:"),
+                    TextButton(
+                      onPressed: () async {
+                        DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2025),
+                          lastDate: DateTime(2030),
+                        );
+                        if (picked != null)
+                          setDialogState(() => selectedDate = picked);
+                      },
+                      child: Text(
+                        DateFormat('yyyy-MM-dd').format(selectedDate),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Clock In Time:"),
+                    TextButton(
+                      onPressed: () async {
+                        TimeOfDay? picked = await showTimePicker(
+                          context: context,
+                          initialTime: selectedTime,
+                        );
+                        if (picked != null)
+                          setDialogState(() => selectedTime = picked);
+                      },
+                      child: Text(selectedTime.format(context)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text("Cancel"),
               ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+                onPressed: () {
+                  if (selectedEmployee != null) {
+                    String formattedTime =
+                        "${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}:00";
+                    String formattedDate = DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(selectedDate);
 
-              const SizedBox(height: 5),
-
-              Row(
-                children: [
-                  const Icon(Icons.play_arrow, size: 16, color: Colors.green),
-                  const SizedBox(width: 5),
-                  Text("Clocked in at $time"),
-                ],
-              ),
-            ],
-          ),
-
-          /// BUTTON
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {},
-            child: const Text("Clock Out"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 🔥 COMPLETED SHIFT CARD
-  Widget completedShiftCard(String name, String hours, String timeRange) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(16),
-
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
-        border: const Border(left: BorderSide(color: Colors.black, width: 5)),
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          /// LEFT
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-
-              const SizedBox(height: 5),
-
-              Row(
-                children: const [
-                  Icon(Icons.calendar_today, size: 14),
-                  SizedBox(width: 5),
-                  Text("2026-01-04"),
-                ],
-              ),
-
-              const SizedBox(height: 5),
-
-              Text(timeRange),
-            ],
-          ),
-
-          /// RIGHT
-          Column(
-            children: [
-              Text(
-                hours,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                    controller.clockIn(
+                      selectedEmployee!,
+                      formattedDate,
+                      formattedTime,
+                    );
+                    Get.back();
+                  } else {
+                    Get.snackbar(
+                      "Required",
+                      "Please select an employee",
+                      backgroundColor: Colors.orange,
+                    );
+                  }
+                },
+                child: const Text(
+                  "Start Shift",
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
-              const Text(
-                "Total Hours",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -153,77 +168,166 @@ class _TimeScreenState extends State<TimeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-
-      /// 🔥 APP BAR
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: const Icon(Icons.arrow_back),
-        title: const Text("Back to Dashboard"),
-      ),
-
-      body: SingleChildScrollView(
+      backgroundColor: Colors.white,
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔥 HEADER
             Container(
-              width: double.infinity,
               color: Colors.black,
-              padding: const EdgeInsets.all(20),
-
-              child: const Text(
-                "Employee Time Tracking",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-            /// 🔥 CONTENT
-            Padding(
-              padding: const EdgeInsets.all(20),
-
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              child: Row(
                 children: [
-                  /// ACTIVE
-                  const Text(
-                    "Active Shifts",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Get.back(),
                   ),
-
-                  const SizedBox(height: 10),
-
-                  activeShiftCard("John Smith", "09:00"),
-                  activeShiftCard("Sarah Johnson", "10:00"),
-
-                  const SizedBox(height: 20),
-
-                  /// COMPLETED
                   const Text(
-                    "Completed Shifts",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    "Time Tracking",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-
-                  const SizedBox(height: 10),
-
-                  completedShiftCard("Mike Davis", "8h", "08:00 - 16:00"),
-                  completedShiftCard("Emily Wilson", "8h", "14:00 - 22:00"),
+                  const Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                    ),
+                    onPressed: _showAddShiftDialog,
+                    child: const Text(
+                      "Add Shift",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ],
               ),
+            ),
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value)
+                  return const Center(child: CircularProgressIndicator());
+                var active = controller.shifts
+                    .where((s) => s.status == 'active')
+                    .toList();
+                var completed = controller.shifts
+                    .where((s) => s.status == 'completed')
+                    .toList();
+                return RefreshIndicator(
+                  onRefresh: () => controller.fetchShifts(),
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      const Text(
+                        "Active Shifts",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ...active.map((s) => _buildShiftCard(s, true)),
+                      const SizedBox(height: 30),
+                      const Text(
+                        "History",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ...completed.map((s) => _buildShiftCard(s, false)),
+                    ],
+                  ),
+                );
+              }),
             ),
           ],
         ),
       ),
+    );
+  }
 
-      /// 🔥 FLOATING BUTTON (OPTIONAL ADD SHIFT)
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
-        onPressed: _showAddShiftDialog,
-        child: const Icon(Icons.add),
+  Widget _buildShiftCard(ShiftModel shift, bool isActive) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border(
+          left: BorderSide(
+            color: isActive ? Colors.green : Colors.black,
+            width: 6,
+          ),
+        ),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  shift.employeeName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  "Date: ${shift.date}",
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                Text(
+                  isActive
+                      ? "In: ${shift.clockIn}"
+                      : "Time: ${shift.clockIn} - ${shift.clockOut}",
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          isActive
+              ? ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () => controller.clockOut(shift.id),
+                  child: const Text(
+                    "Clock Out",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+              : Row(
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          shift.totalHours ?? "0.00",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const Text(
+                          "Hours",
+                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 10),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () => controller.deleteShift(shift.id),
+                    ),
+                  ],
+                ),
+        ],
       ),
     );
   }

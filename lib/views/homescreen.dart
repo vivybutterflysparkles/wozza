@@ -110,7 +110,6 @@ class _HomescreenState extends State<Homescreen> {
               icon: Icons.menu,
               page: MenuScreen(),
             ),
-
             dashboardCard(
               title: "Inventory",
               subtitle: "Manage bar stock",
@@ -118,7 +117,6 @@ class _HomescreenState extends State<Homescreen> {
               icon: Icons.inventory,
               page: const InventoryScreen(),
             ),
-
             dashboardCard(
               title: "Orders",
               subtitle: "Track orders",
@@ -126,7 +124,6 @@ class _HomescreenState extends State<Homescreen> {
               icon: Icons.receipt_long,
               page: const OrdersScreen(),
             ),
-
             dashboardCard(
               title: "Time Tracking",
               subtitle: "Log hours",
@@ -134,15 +131,13 @@ class _HomescreenState extends State<Homescreen> {
               icon: Icons.access_time,
               page: const TimeScreen(),
             ),
-
             dashboardCard(
               title: "Employees",
               subtitle: "Manage staff",
               imagePath: "assets/employees.jpg",
               icon: Icons.people,
-              page: const EmployeesScreen(), // ✅ ONLY here
+              page: const EmployeesScreen(),
             ),
-
             dashboardCard(
               title: "About",
               subtitle: "App info",
@@ -155,14 +150,6 @@ class _HomescreenState extends State<Homescreen> {
       ),
     );
   }
-
-  /// 🔥 BOTTOM NAV PAGES (ONLY 4!)
-  final List<Widget> _pages = const [
-    SizedBox(), // placeholder for dashboard (handled separately)
-    OrdersScreen(),
-    TimeScreen(),
-    ProfileScreen(), // ✅ Profile here
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -180,31 +167,39 @@ class _HomescreenState extends State<Homescreen> {
       ),
 
       /// 🔥 BODY SWITCH
-      body: _currentIndex == 0
-          ? dashboardScreen() // ✅ Home handled separately
-          : _pages[_currentIndex],
+      body: switch (_currentIndex) {
+        0 =>
+          dashboardScreen(), // Dashboard (index 0 = Inventory tab shows dashboard)
+        1 => const OrdersScreen(), // Orders
+        2 => const TimeScreen(), // Time
+        3 => const EmployeesScreen(), // Employees
+        4 => const ProfileScreen(), // Profile
+        _ => dashboardScreen(),
+      },
 
-      /// 🔥 BOTTOM NAV
+      /// 🔥 BOTTOM NAV — 5 items
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.black,
         selectedItemColor: primaryColor,
         unselectedItemColor: Colors.white70,
+        selectedFontSize: 11,
+        unselectedFontSize: 11,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2),
+            label: "Inventory",
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.receipt_long),
             label: "Orders",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.access_time), label: "Time"),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: "Employees"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onTap: (index) => setState(() => _currentIndex = index),
       ),
     );
   }
